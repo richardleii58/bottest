@@ -6,7 +6,7 @@ import datetime
 import os
 import psycopg2
 from urllib.parse import urlparse
-import keep_alive
+## import keep_alive
 
 TOKEN = os.environ['TELEGRAM_TOKEN']
 URL = f"https://api.telegram.org/bot{TOKEN}/"
@@ -186,15 +186,7 @@ def echo_all(updates):
         except Exception as e:
             print(e)
 
-def main():
-    keep_alive.keep_alive()
-    last_update_id = None
-    while True:
-        updates = get_updates(last_update_id)
-        if "result" in updates and len(updates["result"]) > 0:
-            last_update_id = get_last_update_id(updates) + 1
-            echo_all(updates)
-        time.sleep(0.5)
+
 
 if __name__ == '__main__':
     main()
