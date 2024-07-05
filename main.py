@@ -83,7 +83,11 @@ def admin(x):
     print("hello")
     
 def main():
-    print("hello")
+    print("hello") 
+    
+    while True:
+        i = 1
+
 
 if __name__ == '__main__':
     main()
