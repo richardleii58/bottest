@@ -14,3 +14,6 @@ tzdata==2024.1
 tzlocal==5.2
 urllib3==1.26.15
 virtualenv==20.26.3
+requests
+psycopg2-binary
+
