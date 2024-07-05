@@ -81,10 +81,7 @@ def get_last_update_id(updates):
 
 def admin(x):
     print("hello")
-
-def echo_all(updates):
     
-
 def main():
     print("hello")
 
