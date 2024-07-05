@@ -20,7 +20,35 @@ conn = psycopg2.connect(
     host=url.hostname,
     port=url.port
 )
+conn.set_session(readonly=False)  # Ensure the connection is not read-only
 cursor = conn.cursor()
+
+# Create tables if they don't exist
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        chat_id BIGINT UNIQUE,
+        first_name TEXT,
+        date_joined DATE
+    );
+''')
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS qns (
+        question_number TEXT PRIMARY KEY,
+        keywords TEXT[],
+        question TEXT,
+        answer TEXT
+    );
+''')
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS categories (
+        id SERIAL PRIMARY KEY,
+        category_name TEXT,
+        question_number TEXT,
+        FOREIGN KEY (question_number) REFERENCES qns (question_number)
+    );
+''')
+conn.commit()
 
 def get_url(url):
     response = requests.get(url)
