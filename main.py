@@ -8,7 +8,7 @@ import psycopg2
 from urllib.parse import urlparse
 ## import keep_alive
 
-TOKEN = os.environ['TELEGRAM_TOKEN']
+TOKEN = os.environ['TOKEN']
 URL = f"https://api.telegram.org/bot{TOKEN}/"
 
 DATABASE_URL = os.environ['DATABASE_URL']
