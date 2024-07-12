@@ -69,10 +69,7 @@ def handleText(update: Update, context: CallbackContext):
     if state == "ready": 
         # give confirmation message
         # allow them to add more info or edit their information 
-        # write_file(curBuffet['photo'], photo)
-
-        update.message.reply_photo(curBuffet['photo'])
-        update.message.reply_text(f"Location: {curBuffet['location']}\nTime: {curBuffet['expiry']}!")
+        update.message.reply_photo(curBuffet['photo'], f"Location: {curBuffet['location']}\nTime: {curBuffet['expiry']}!")
         print(curBuffet)
         
 
@@ -101,15 +98,12 @@ def main():
     # dp = updater.dispatcher
 
     # It handle /start or other slash commands
-    dp.add_handler(CommandHandler("start", introduce))
-    # dp.add_handler(CommandHandler("hi",start))
-    # dp.add_handler(CommandHandler("kaishi",start))
+    dp.add_handler(CommandHandler("start", introduce)) # slash command to test
 
-    startHandler = MessageHandler(Filters.text, handleText)
-    dp.add_handler(startHandler) # this code runs hello world if you say anything under than bye
-    # if use Filters.all, then even if it is video or photo also will say start
+    dp.add_handler(MessageHandler(Filters.text, handleText))     
     dp.add_handler(MessageHandler(Filters.photo, handlePhoto))
-
+        # may have future problem if you want to upload multiple photographs
+    
     updater.start_polling()
 
     Updater.idle()
