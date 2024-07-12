@@ -12,6 +12,17 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+def convertToBinaryData(filename):
+    # Convert digital data to binary format
+    with open(filename, 'rb') as file:
+        binaryData = file.read()
+    return binaryData
+
+def write_file(data, filename):
+    # Convert binary data to proper format and write it on Hard Disk
+    with open(filename, 'wb') as file:
+        file.write(data)
+
 load_dotenv("./.env")
 TOKEN = os.getenv("token")
 
@@ -58,8 +69,12 @@ def handleText(update: Update, context: CallbackContext):
     if state == "ready": 
         # give confirmation message
         # allow them to add more info or edit their information 
+        # write_file(curBuffet['photo'], photo)
+
+        update.message.reply_photo(curBuffet['photo'])
         update.message.reply_text(f"Location: {curBuffet['location']}\nTime: {curBuffet['expiry']}!")
         print(curBuffet)
+        
 
 def introduce(update: Update, context: CallbackContext):
     update.message.reply_text("Available commands:\n"
@@ -72,8 +87,9 @@ def introduce(update: Update, context: CallbackContext):
 def handlePhoto(update: Update, context: CallbackContext):
     update.message.reply_text("You have uploaded a photo!")
     # turn into blob: https://pynative.com/python-mysql-blob-insert-retrieve-file-image-as-a-blob-in-mysql/#h-what-is-blob
-    curBuffet["photo"] = "PHOTO PLACEHOLDER"
-
+    file_id = update.message.photo[-1].file_id
+    curBuffet['photo'] = file_id
+    print(file_id)
     global state
     state = "location"
     update.message.reply_text("Where is this found?")
@@ -85,7 +101,7 @@ def main():
     # dp = updater.dispatcher
 
     # It handle /start or other slash commands
-    dp.add_handler(CommandHandler("start",introduce))
+    dp.add_handler(CommandHandler("start", introduce))
     # dp.add_handler(CommandHandler("hi",start))
     # dp.add_handler(CommandHandler("kaishi",start))
 
