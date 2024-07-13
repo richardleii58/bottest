@@ -6,6 +6,12 @@ import datetime
 import os
 import psycopg2
 from urllib.parse import urlparse
+import random
+import string
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 ##import keep_alive
 
 TOKEN = os.environ['TOKEN']
@@ -82,12 +88,71 @@ def get_last_update_id(updates):
 def admin(x):
     print("hello")
     
-def main():
-    print("hello") 
-    
-    while True:
-        i = 1
+# Email configuration
+EMAIL_ADDRESS = "YOUR_EMAIL_ADDRESS"
+EMAIL_PASSWORD = "YOUR_EMAIL_PASSWORD"
 
+# Dictionary to store user OTPs
+user_otps = {}
+
+# Function to generate a random OTP
+def generate_otp():
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+
+# Function to send OTP via email
+def send_email(recipient_email, otp):
+    subject = "Your One-Time Password (OTP)"
+    body = f"Your OTP is: {otp}"
+
+    msg = MIMEMultipart()
+    msg['From'] = EMAIL_ADDRESS
+    msg['To'] = recipient_email
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(body, 'plain'))
+
+    with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+        smtp.starttls()
+        smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        smtp.send_message(msg)
+
+# Handler for the /start command
+def start(update, context):
+    update.message.reply_text('Hello! I am your Telegram bot.')
+
+# Handler for receiving messages
+def receive_message(update, context):
+    user_id = update.effective_user.id
+    user_message = update.message.text
+
+    # Check if the user is waiting for OTP confirmation
+    if user_id in user_otps:
+        # Check if the received message matches the OTP
+        if user_message == user_otps[user_id]:
+            update.message.reply_text('OTP verified successfully!')
+            del user_otps[user_id]  # Remove OTP from dictionary
+        else:
+            update.message.reply_text('Invalid OTP! Please try again.')
+
+# Handler for the /otp command
+def request_otp(update, context):
+    user_id = update.effective_user.id
+    email = "USER_EMAIL@example.com"  # Replace with user's email address
+    otp = generate_otp()
+    user_otps[user_id] = otp  # Store OTP in dictionary
+    send_email(email, otp)
+    update.message.reply_text('An OTP has been sent to your email. Please check and enter it here.')
+
+def main():
+    updater = Updater(TOKEN, use_context=True)
+    dp = updater.dispatcher
+
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("otp", request_otp))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, receive_message))
+
+    updater.start_polling()
+    updater.idle()
 
 if __name__ == '__main__':
     main()
