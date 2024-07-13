@@ -89,8 +89,8 @@ def admin(x):
     print("hello")
     
 # Email configuration
-EMAIL_ADDRESS = "buffetclearers@gmail.com"
-EMAIL_PASSWORD = "untu vjru xpaz kzkq"
+EMAIL_ADDRESS = os.environ['EMAIL_ADDRESS']
+EMAIL_PASSWORD = os.environ['EMAIL_PASSWORD']
 
 # Dictionary to store user OTPs
 user_otps = {}
