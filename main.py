@@ -90,7 +90,7 @@ def admin(x):
     
 # Email configuration
 EMAIL_ADDRESS = "buffetclearers@gmail.com"
-EMAIL_PASSWORD = "Megatron1@"
+EMAIL_PASSWORD = "untu vjru xpaz kzkq"
 
 # Dictionary to store user OTPs
 user_otps = {}
