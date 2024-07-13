@@ -89,8 +89,8 @@ def admin(x):
     print("hello")
     
 # Email configuration
-EMAIL_ADDRESS = "YOUR_EMAIL_ADDRESS"
-EMAIL_PASSWORD = "YOUR_EMAIL_PASSWORD"
+EMAIL_ADDRESS = "qwqw59079@gmail.com"
+EMAIL_PASSWORD = "Pm&Cc8wBn`+0V>p"
 
 # Dictionary to store user OTPs
 user_otps = {}
@@ -137,7 +137,7 @@ def receive_message(update, context):
 # Handler for the /otp command
 def request_otp(update, context):
     user_id = update.effective_user.id
-    email = "USER_EMAIL@example.com"  # Replace with user's email address
+    email = "leirichard58@gmail.com"  # Replace with user's email address
     otp = generate_otp()
     user_otps[user_id] = otp  # Store OTP in dictionary
     send_email(email, otp)
