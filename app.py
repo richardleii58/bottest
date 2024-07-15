@@ -1,5 +1,5 @@
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters, ConversationHandler
 from dotenv import load_dotenv
 import logging
 import os
@@ -8,6 +8,8 @@ from slashCommands import start, introduce
 from buffet import Buffet
 from database import executeSQL
 from channel import broadcast
+from otp import request_otp, handle_email, receive_message, cancel, EMAIL, OTP
+
 
 logging.basicConfig(
     format = '%(asctime)s -- %(name)s -- %(levelname)s -- %(message)s',
@@ -58,7 +60,7 @@ def handleText(update: Update, context: CallbackContext):
 
     elif state == "expiry": 
         # may need to add checks here to verify that it's correct
-        curBuffet["expiry"] = update.message.text
+        curBuffet["expiry"] = update.message.text # change this to buttons instead
         update.message.reply_text("You have entered a time!")
         # expiry date successful added, move on to next step
         state = "ready"
@@ -67,9 +69,9 @@ def handleText(update: Update, context: CallbackContext):
     if state == "ready": 
         # give confirmation message
         # allow them to add more info or edit their information 
-        update.message.reply_photo(curBuffet['photo'], f"Location: {curBuffet['location']}\nTime: {curBuffet['expiry']}")
+        update.message.reply_photo(curBuffet['file_id'], f"Location: {curBuffet['location']}\nTime: {curBuffet['expiry']}")
         print(curBuffet)
-        buffetObj = Buffet(curBuffet['photo'], curBuffet['location'], curBuffet['expiry'])
+        buffetObj = Buffet(curBuffet['file_id'], curBuffet['location'], curBuffet['expiry'])
 
         # SENDING IT OFF
         upload(buffetObj)
@@ -82,7 +84,7 @@ def upload(buffetObj):
     # photo, expiry, location, info
     sql = f"insert into buffet(photo, expiry, location, info) values \
             ('{buffetObj.photo}', '{buffetObj.expiry}', '{buffetObj.location}', NULL);"
-    # sql = f"insert into buffet values ('{curBuffet['photo']}', '{curBuffet['location']}', '{curBuffet['expiry']}', NULL);"values
+    # sql = f"insert into buffet values ('{curBuffet['file_id']}', '{curBuffet['location']}', '{curBuffet['expiry']}', NULL);"values
     # print(sql)
     executeSQL(sql)
 
@@ -91,26 +93,66 @@ def handlePhoto(update: Update, context: CallbackContext):
     update.message.reply_text("You have uploaded a photo!")
     # turn into blob: https://pynative.com/python-mysql-blob-insert-retrieve-file-image-as-a-blob-in-mysql/#h-what-is-blob
     file_id = update.message.photo[-1].file_id
-    curBuffet['photo'] = file_id
+    curBuffet['file_id'] = file_id
     global state
     state = "location"
     update.message.reply_text("Where is this found?")
+
+
+
+user_ids = []
+def user_verified(user_id):
+    if user_id in user_ids:
+        print("user id found")
+        return True
+    else:
+        print("user id not found")
+        return False 
+
+def verify(update: Update, context: CallbackContext):
+    global user_ids
+    user_id = update.effective_user.id
+    user_ids.append(user_id)  
+    print("after verify (in command)", user_ids)
+    dp.add_handler(MessageHandler(Filters.text, handleText))     
+    dp.add_handler(MessageHandler(Filters.photo, handlePhoto))
+
 
 
 def main():
     # transferred these two lines above to test, may need to move back here
     # updater = Updater(TOKEN, use_context=True)
     # dp = updater.dispatcher
+    print("at the start, user_ids", user_ids)
 
     # It handle /start or other slash commands
-    dp.add_handler(CommandHandler("start", introduce)) # slash command to test
-    dp.add_handler(CommandHandler("kaishi", start)) # slash command to test
+    dp.add_handler(CommandHandler("start", start)) # slash command to test
+    dp.add_handler(CommandHandler("verify", verify)) # slash command to test
 
+    # otp stuff from richard
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler('otp', request_otp)],
+        states={
+            EMAIL: [MessageHandler(Filters.text & ~Filters.command, handle_email)],
+            OTP: [MessageHandler(Filters.text & ~Filters.command, receive_message)],
+        },
+        fallbacks=[CommandHandler('cancel', cancel)]
+    )
+    # dp.add_handler(CommandHandler("clear_otps", admin_clear_otps))
+    dp.add_handler(conv_handler)
 
-    dp.add_handler(MessageHandler(Filters.text, handleText))     
-    dp.add_handler(MessageHandler(Filters.photo, handlePhoto))
+    user_id = "test"
+    if user_verified(user_id): 
+        print("verified")
+        print("current user_ids", user_ids)
+        dp.add_handler(MessageHandler(Filters.text, handleText))     
+        dp.add_handler(MessageHandler(Filters.photo, handlePhoto))
         # may have future problem if you want to upload multiple photographs
-    
+    else:
+        print("not verified")
+        print("current user_ids", user_ids)
+
+   
     updater.start_polling()
 
     Updater.idle()
