@@ -92,8 +92,9 @@ def admin(x):
 EMAIL_ADDRESS = os.environ['EMAIL_ADDRESS']
 EMAIL_PASSWORD = os.environ['EMAIL_PASSWORD']
 
-# Dictionary to store user OTPs
+# Dictionary to store OTPs and their confirmation status
 user_otps = {}
+otp_confirmed = {}
 
 # Function to generate a random OTP
 def generate_otp():
@@ -120,36 +121,39 @@ def send_email(recipient_email, otp):
 def start(update, context):
     update.message.reply_text('Hello! I am your Telegram bot.')
 
-# Handler for receiving messages
-def receive_message(update, context):
-    user_id = update.effective_user.id
-    user_message = update.message.text
 
-    # Check if the user is waiting for OTP confirmation
-    if user_id in user_otps:
-        # Check if the received message matches the OTP
-        if user_message == user_otps[user_id]:
-            update.message.reply_text('OTP verified successfully!')
-            del user_otps[user_id]  # Remove OTP from dictionary
-        else:
-            update.message.reply_text('Invalid OTP! Please try again.')
-
-# Handler for the /otp command
 def request_otp(update, context):
     user_id = update.effective_user.id
+    
+    # Check if OTP is already confirmed
+    if otp_confirmed.get(user_id, False):
+        update.message.reply_text('Your OTP has already been confirmed. No need to request a new one.')
+        return
+    
     email = "leirichard58@gmail.com"  # Replace with user's email address
     otp = generate_otp()
     user_otps[user_id] = otp  # Store OTP in dictionary
     send_email(email, otp)
     update.message.reply_text('An OTP has been sent to your email. Please check and enter it here.')
 
+def confirm_otp(update, context):
+    user_id = update.effective_user.id
+    entered_otp = update.message.text.strip()
+    
+    # Verify the OTP
+    if user_otps.get(user_id) == entered_otp:
+        otp_confirmed[user_id] = True
+        update.message.reply_text('OTP confirmed successfully!')
+    else:
+        update.message.reply_text('Incorrect OTP. Please try again.')
+
 def main():
     updater = Updater(TOKEN, use_context=True)
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("otp", request_otp))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, receive_message))
+    dp.add_handler(CommandHandler("otp", confirm_otp))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, request_otp))
 
     updater.start_polling()
     updater.idle()
