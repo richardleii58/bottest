@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 import logging
 import os
 
+from slashCommands import start
+from buffet import Buffet
+from database import executeSQL
 
 logging.basicConfig(
     format = '%(asctime)s -- %(name)s -- %(levelname)s -- %(message)s',
@@ -31,13 +34,6 @@ state = "blank" # i need a variable to track what stage the user is at, to be re
 
 updater = Updater(TOKEN, use_context=True)
 dp = updater.dispatcher
-
-def start(update: Update, context: CallbackContext): 
-    # test, to delete
-    if "bye" in update.message.text.lower():
-        update.message.reply_text("Goodbye")
-    else:
-        update.message.reply_text("Hello, World!")
 
 def handleText(update: Update, context: CallbackContext):
     # else if used so that it only registers one state at a time
@@ -69,16 +65,19 @@ def handleText(update: Update, context: CallbackContext):
     if state == "ready": 
         # give confirmation message
         # allow them to add more info or edit their information 
-        update.message.reply_photo(curBuffet['photo'], f"Location: {curBuffet['location']}\nTime: {curBuffet['expiry']}!")
+        update.message.reply_photo(curBuffet['photo'], f"Location: {curBuffet['location']}\nTime: {curBuffet['expiry']}")
         print(curBuffet)
-        
+        buffetObj = Buffet(curBuffet['photo'], curBuffet['location'], curBuffet['expiry'])
+        upload(buffetObj)
 
-def introduce(update: Update, context: CallbackContext):
-    update.message.reply_text("Available commands:\n"
-                              "/start - Start the bot\n"
-                              "/help - Display available commands\n"
-                              "/cat - Get a random cat picture")
-
+def upload(buffetObj):
+    # database stuff
+    print(buffetObj)
+    sql = "insert into course values (111, 'aaa');"
+    sql2 = "insert into course values (222, 'bbb');"
+    executeSQL(sql)
+    executeSQL(sql2)
+    # if function works, should have 111 and 112 appearing in database
 
 
 def handlePhoto(update: Update, context: CallbackContext):
@@ -86,11 +85,11 @@ def handlePhoto(update: Update, context: CallbackContext):
     # turn into blob: https://pynative.com/python-mysql-blob-insert-retrieve-file-image-as-a-blob-in-mysql/#h-what-is-blob
     file_id = update.message.photo[-1].file_id
     curBuffet['photo'] = file_id
-    print(file_id)
     global state
     state = "location"
     update.message.reply_text("Where is this found?")
     
+
 
 def main():
     # transferred these two lines above to test, may need to move back here
@@ -99,6 +98,8 @@ def main():
 
     # It handle /start or other slash commands
     dp.add_handler(CommandHandler("start", introduce)) # slash command to test
+    dp.add_handler(CommandHandler("kaishi", start)) # slash command to test
+
 
     dp.add_handler(MessageHandler(Filters.text, handleText))     
     dp.add_handler(MessageHandler(Filters.photo, handlePhoto))
