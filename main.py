@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 import random
 import string
 import smtplib
+import re
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
@@ -99,6 +100,18 @@ EMAIL, OTP = range(2)
 user_otps = {}
 otp_confirmed = {}
 
+# List of admin user IDs
+ADMIN_USERS = [123456789]  # Replace with actual admin user IDs
+
+def admin_clear_otps(update, context):
+    user_id = update.effective_user.id
+    if user_id in ADMIN_USERS:
+        user_otps.clear()
+        otp_confirmed.clear()
+        update.message.reply_text('All OTPs have been cleared.')
+    else:
+        update.message.reply_text('You do not have permission to use this command.')
+
 # Function to generate a random OTP
 def generate_otp():
     return ''.join(random.choices(string.ascii_letters + string.digits, k=6))
@@ -128,6 +141,11 @@ def start(update, context):
 def handle_email(update, context):
     user_id = update.effective_user.id
     email = update.message.text.strip()
+    
+    # Validate email format
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        update.message.reply_text('Invalid email address. Please enter a valid email address:')
+        return EMAIL
     
     otp = generate_otp()
     user_otps[user_id] = {'otp': otp, 'email': email}  # Store OTP and email in dictionary
@@ -176,6 +194,7 @@ def main():
     )
 
     dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("clear_otps", admin_clear_otps))
     dp.add_handler(conv_handler)    
 
     updater.start_polling()
