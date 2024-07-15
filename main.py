@@ -163,10 +163,9 @@ def request_otp(update, context):
     return EMAIL
 
 def main():
-    updater = Updater("YOUR_BOT_TOKEN", use_context=True)
+    updater = Updater(TOKEN, use_context=True)
     dp = updater.dispatcher
-
-    # Define the conversation handler
+    
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('otp', request_otp)],
         states={
@@ -177,8 +176,8 @@ def main():
     )
 
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(conv_handler)
-    
+    dp.add_handler(conv_handler)    
+
     updater.start_polling()
     updater.idle()
 
