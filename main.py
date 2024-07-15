@@ -11,7 +11,7 @@ import string
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 ##import keep_alive
 
 TOKEN = os.environ['TOKEN']
@@ -92,7 +92,10 @@ def admin(x):
 EMAIL_ADDRESS = os.environ['EMAIL_ADDRESS']
 EMAIL_PASSWORD = os.environ['EMAIL_PASSWORD']
 
-# Dictionary to store user OTPs
+# Define conversation states
+EMAIL, OTP = range(2)
+
+# Dictionary to store OTPs and their confirmation status
 user_otps = {}
 otp_confirmed = {}
 
@@ -121,17 +124,33 @@ def send_email(recipient_email, otp):
 def start(update, context):
     update.message.reply_text('Hello! I am your Telegram bot.')
 
+# handler for dynamic email
+def handle_email(update, context):
+    user_id = update.effective_user.id
+    email = update.message.text.strip()
+    
+    otp = generate_otp()
+    user_otps[user_id] = {'otp': otp, 'email': email}  # Store OTP and email in dictionary
+    send_email(email, otp)
+    update.message.reply_text('An OTP has been sent to your email. Please check and enter it here:')
+    return OTP
+
 # Handler for receiving messages
 def receive_message(update, context):
     user_id = update.effective_user.id
     entered_otp = update.message.text.strip()
     
-    # Verify the OTP
-    if user_otps.get(user_id) == entered_otp:
+    if user_otps.get(user_id) and user_otps[user_id]['otp'] == entered_otp:
         otp_confirmed[user_id] = True
         update.message.reply_text('OTP confirmed successfully!')
+        return ConversationHandler.END
     else:
         update.message.reply_text('Incorrect OTP. Please try again.')
+        return OTP
+
+def cancel(update, context):
+    update.message.reply_text('OTP request canceled.')
+    return ConversationHandler.END
 
 # Handler for the /otp command
 def request_otp(update, context):
@@ -140,11 +159,8 @@ def request_otp(update, context):
         update.message.reply_text('Your OTP has already been confirmed. No need to request a new one.')
         return
     
-    email = "leirichard58@gmail.com"  # Replace with user's email address
-    otp = generate_otp()
-    user_otps[user_id] = otp  # Store OTP in dictionary
-    send_email(email, otp)
-    update.message.reply_text('An OTP has been sent to your email. Please check and enter it here.')
+    update.message.reply_text('Please enter your email address:')
+    return EMAIL
 
 def main():
     updater = Updater(TOKEN, use_context=True)
