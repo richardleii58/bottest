@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import logging
 import os
 
-from slashCommands import start
+from slashCommands import start, introduce
 from buffet import Buffet
 from database import executeSQL
 
@@ -72,12 +72,12 @@ def handleText(update: Update, context: CallbackContext):
 
 def upload(buffetObj):
     # database stuff
-    print(buffetObj)
-    sql = "insert into course values (111, 'aaa');"
-    sql2 = "insert into course values (222, 'bbb');"
+    # photo, expiry, location, info
+    sql = f"insert into buffet(photo, expiry, location, info) values \
+            ('{buffetObj.photo}', '{buffetObj.expiry}', '{buffetObj.location}', NULL);"
+    # sql = f"insert into buffet values ('{curBuffet['photo']}', '{curBuffet['location']}', '{curBuffet['expiry']}', NULL);"values
+    # print(sql)
     executeSQL(sql)
-    executeSQL(sql2)
-    # if function works, should have 111 and 112 appearing in database
 
 
 def handlePhoto(update: Update, context: CallbackContext):
@@ -88,7 +88,6 @@ def handlePhoto(update: Update, context: CallbackContext):
     global state
     state = "location"
     update.message.reply_text("Where is this found?")
-    
 
 
 def main():

@@ -29,17 +29,18 @@ print(conn)
 conn.set_session(readonly=False)  # Ensure the connection is not read-only
 cursor = conn.cursor()
 
+# cursor.execute("DROP TABLE IF EXISTS buffet;") # used to delete table (if there are changes lol)
+
 # Create tables if they don't exist
 cursor.execute('''
-    CREATE TABLE IF NOT EXISTS users (
+     CREATE TABLE IF NOT EXISTS buffet (
         id SERIAL PRIMARY KEY,
-        chat_id BIGINT UNIQUE,
-        first_name TEXT,
-        date_joined DATE
+        photo TEXT not null,
+        location TEXT not null,
+        expiry TEXT not null,
+        info TEXT
     );
 ''') # triple ' lets you enter multiline
-
-
 
 conn.commit() # this line saves whatever you did to the database, basically
 
@@ -48,7 +49,6 @@ conn.close()
 
 def executeSQL(sqlStatement):
     DATABASE_URL = os.environ['DATABASE_URL'] 
-    # DATABASE_URL = "postgres://u4isou11nefphr:pa6260f4e7a7c6b542be9b972885c24f6ee2aadae403bbd8a0f22e03ab79be293@cb5ajfjosdpmil.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d2nbu7fnbnkslv"
     url = urlparse(DATABASE_URL) 
 
     conn = psycopg2.connect(
