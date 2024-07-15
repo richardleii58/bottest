@@ -152,8 +152,8 @@ def main():
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("otp", confirm_otp))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, request_otp))
+    dp.add_handler(CommandHandler("otp", request_otp))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, confirm_otp))
 
     updater.start_polling()
     updater.idle()
