@@ -7,6 +7,7 @@ import os
 from slashCommands import start, introduce
 from buffet import Buffet
 from database import executeSQL
+from channel import broadcast
 
 logging.basicConfig(
     format = '%(asctime)s -- %(name)s -- %(levelname)s -- %(message)s',
@@ -38,6 +39,7 @@ dp = updater.dispatcher
 def handleText(update: Update, context: CallbackContext):
     # else if used so that it only registers one state at a time
     global state
+    print(state)
 
     if state == "blank":
         # this means that the user has not done anything yet
@@ -68,7 +70,12 @@ def handleText(update: Update, context: CallbackContext):
         update.message.reply_photo(curBuffet['photo'], f"Location: {curBuffet['location']}\nTime: {curBuffet['expiry']}")
         print(curBuffet)
         buffetObj = Buffet(curBuffet['photo'], curBuffet['location'], curBuffet['expiry'])
+
+        # SENDING IT OFF
         upload(buffetObj)
+        broadcast(buffetObj)
+        state = "blank"
+
 
 def upload(buffetObj):
     # database stuff
