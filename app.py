@@ -28,8 +28,10 @@ def write_file(data, filename):
     with open(filename, 'wb') as file:
         file.write(data)
 
-load_dotenv("./.env")
-TOKEN = os.getenv("token")
+
+TOKEN = os.environ['TOKEN']
+# load_dotenv("./.env")
+# TOKEN = os.getenv("token")
 
 curBuffet = {} # initiate dictionary? to store the info user is inputting before uploading to database
 state = "blank" # i need a variable to track what stage the user is at, to be reset everytime

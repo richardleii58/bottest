@@ -14,8 +14,9 @@ from dotenv import load_dotenv # to use the .env file
 # URL = f"https://api.telegram.org/bot{TOKEN}/"
 # DATABASE_URL = os.environ['DATABASE_URL'] 
 
-load_dotenv("./.env")
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.environ("DATABASE_URL")
+# load_dotenv("./.env")
+# DATABASE_URL = os.getenv("DATABASE_URL")
 url = urlparse(DATABASE_URL) 
 
 conn = psycopg2.connect(
