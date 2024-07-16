@@ -6,6 +6,13 @@ import datetime
 import os
 import psycopg2
 from urllib.parse import urlparse
+import random
+import string
+import smtplib
+import re
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 ##import keep_alive
 
 TOKEN = os.environ['TOKEN']
@@ -82,12 +89,50 @@ def get_last_update_id(updates):
 def admin(x):
     print("hello")
     
-def main():
-    print("hello") 
-    
-    while True:
-        i = 1
+# Email configuration
+EMAIL_ADDRESS = os.environ['EMAIL_ADDRESS']
+EMAIL_PASSWORD = os.environ['EMAIL_PASSWORD']
 
+# Define conversation states
+EMAIL, OTP = range(2)
 
-if __name__ == '__main__':
-    main()
+# Dictionary to store OTPs and their confirmation status
+user_otps = {}
+otp_confirmed = {}
+
+# List of admin user IDs
+ADMIN_USERS = [123456789]  # Replace with actual admin user IDs
+
+def admin_clear_otps(update, context):
+    user_id = update.effective_user.id
+    if user_id in ADMIN_USERS:
+        user_otps.clear()
+        otp_confirmed.clear()
+        update.message.reply_text('All OTPs have been cleared.')
+    else:
+        update.message.reply_text('You do not have permission to use this command.')
+
+# Function to generate a random OTP
+def generate_otp():
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+
+# Function to send OTP via email
+def send_email(recipient_email, otp):
+    subject = "Your One-Time Password (OTP)"
+    body = f"Your OTP is: {otp}"
+
+    msg = MIMEMultipart()
+    msg['From'] = EMAIL_ADDRESS
+    msg['To'] = recipient_email
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(body, 'plain'))
+
+    with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+        smtp.starttls()
+        smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        smtp.send_message(msg)
+
+# Handler for the /start command
+def start(update, context):
+    update.message.reply_text('Hello! I am your Telegram bot.')
