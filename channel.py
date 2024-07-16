@@ -18,7 +18,7 @@ def convert_to_list(str):
     return new_list
 
 # CHAT_IDS = os.getenv("chat_ids")
-CHAT_IDS = os.environ["CHAT_IDS"]
+CHAT_IDS = os.environ["chat_ids"]
 CHAT_IDS = convert_to_list(CHAT_IDS)
 
 
