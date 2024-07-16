@@ -1,4 +1,5 @@
 from telegram import Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters, ConversationHandler
 from dotenv import load_dotenv
 import logging
@@ -38,14 +39,30 @@ verified = False
 updater = Updater(TOKEN, use_context=True)
 dp = updater.dispatcher
 
-def start(update: Update, context: CallbackContext): 
-    update.message.reply_text("Hello and welcome to BufferClearers Bot! 👋\n\n"
+def start(update, context):
+    keyboard = [
+        [InlineKeyboardButton("Verify Now", callback_data='verify')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    welcome_message = (
+        "Hello and welcome to BufferClearers Bot! 👋\n\n"
         "This bot is here to help you with various tasks and provide you with seamless interactions. "
         "To access certain features and ensure the security of your account, we require email verification. "
         "Please click the button below to start the verification process. "
         "Once verified, you'll be able to enjoy all the features our bot has to offer!\n\n"
         "If you have any questions or need assistance, feel free to reach out.\n\n"
-        "Let's get started!")
+        "Let's get started!"
+    )
+    
+    update.message.reply_text(welcome_message, reply_markup=reply_markup)
+
+def button(update, context):
+    query = update.callback_query
+    query.answer()
+
+    if query.data == 'verify':
+        request_otp(query, context)
 
 
 def handleText(update: Update, context: CallbackContext):
