@@ -39,7 +39,13 @@ updater = Updater(TOKEN, use_context=True)
 dp = updater.dispatcher
 
 def start(update: Update, context: CallbackContext): 
-    update.message.reply_text("[welcome message]")
+    update.message.reply_text("Hello and welcome to BufferClearers Bot! 👋\n\n"
+        "This bot is here to help you with various tasks and provide you with seamless interactions. "
+        "To access certain features and ensure the security of your account, we require email verification. "
+        "Please click the button below to start the verification process. "
+        "Once verified, you'll be able to enjoy all the features our bot has to offer!\n\n"
+        "If you have any questions or need assistance, feel free to reach out.\n\n"
+        "Let's get started!")
 
 
 def handleText(update: Update, context: CallbackContext):
