@@ -7,6 +7,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 
+from database import getVerifiedUserIDs, addVerifiedUser
+
 # Email configuration
 EMAIL_ADDRESS = os.environ['EMAIL_ADDRESS']
 EMAIL_PASSWORD = os.environ['EMAIL_PASSWORD']
@@ -16,9 +18,6 @@ EMAIL, OTP = range(2)
 
 # Dictionary to store OTPs and their confirmation status
 user_otps = {}
-otp_confirmed = {}
-print("in otp.py", otp_confirmed)
-
 
 # List of admin user IDs
 ADMIN_USERS = [123456789]  # Replace with actual admin user IDs
@@ -27,7 +26,7 @@ def admin_clear_otps(update, context):
     user_id = update.effective_user.id
     if user_id in ADMIN_USERS:
         user_otps.clear()
-        otp_confirmed.clear()
+        # otp_confirmed.clear()
         update.message.reply_text('All OTPs have been cleared.')
     else:
         update.message.reply_text('You do not have permission to use this command.')
@@ -75,10 +74,8 @@ def receive_message(update, context):
     entered_otp = update.message.text.strip()
     
     if user_otps.get(user_id) and user_otps[user_id]['otp'] == entered_otp:
-        otp_confirmed[user_id] = True
         update.message.reply_text('OTP confirmed successfully!')
-        # add user into database?
-        
+        addVerifiedUser(user_id)
         return ConversationHandler.END
     else:
         update.message.reply_text('Incorrect OTP. Please try again.')
@@ -91,9 +88,10 @@ def cancel(update, context):
 # Handler for the /otp command
 def request_otp(update, context):
     user_id = update.effective_user.id
-    if otp_confirmed.get(user_id, False):
+    if user_id in getVerifiedUserIDs():
         update.message.reply_text('Your OTP has already been confirmed. No need to request a new one.')
         return
-    
+
     update.message.reply_text('Please enter your email address:')
     return EMAIL
+

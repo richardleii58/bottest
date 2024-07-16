@@ -4,11 +4,10 @@ from dotenv import load_dotenv
 import logging
 import os
 
-from slashCommands import start, introduce
 from buffet import Buffet
-from database import executeSQL
+from database import executeSQL, addVerifiedUser, getVerifiedUserIDs
 from channel import broadcast
-from otp import request_otp, handle_email, receive_message, cancel, EMAIL, OTP
+from otp import *
 
 
 logging.basicConfig(
@@ -34,14 +33,33 @@ TOKEN = os.getenv("token")
 
 curBuffet = {} # initiate dictionary? to store the info user is inputting before uploading to database
 state = "blank" # i need a variable to track what stage the user is at, to be reset everytime
+verified = False
 
 updater = Updater(TOKEN, use_context=True)
 dp = updater.dispatcher
 
+def start(update: Update, context: CallbackContext): 
+    update.message.reply_text("[welcome message]")
+
+
 def handleText(update: Update, context: CallbackContext):
     # else if used so that it only registers one state at a time
     global state
+    global verified
+
     print(state)
+    if verified == False:
+        # then check if it has been recently verified
+        user_id = update.effective_user.id
+        verified_users = getVerifiedUserIDs()
+        print(user_id)
+        print(verified_users)
+
+        if user_id in verified_users:
+            verified = True
+        else:
+            update.message.reply_text("Use /otp to verify")
+            return # don't want to let them keep going
 
     if state == "blank":
         # this means that the user has not done anything yet
@@ -84,12 +102,14 @@ def upload(buffetObj):
     # photo, expiry, location, info
     sql = f"insert into buffet(photo, expiry, location, info) values \
             ('{buffetObj.photo}', '{buffetObj.expiry}', '{buffetObj.location}', NULL);"
-    # sql = f"insert into buffet values ('{curBuffet['file_id']}', '{curBuffet['location']}', '{curBuffet['expiry']}', NULL);"values
-    # print(sql)
     executeSQL(sql)
 
 
 def handlePhoto(update: Update, context: CallbackContext):
+    global verified
+    if verified == False:
+        update.message.reply_text("Use /otp to get started")
+        return
     update.message.reply_text("You have uploaded a photo!")
     # turn into blob: https://pynative.com/python-mysql-blob-insert-retrieve-file-image-as-a-blob-in-mysql/#h-what-is-blob
     file_id = update.message.photo[-1].file_id
@@ -98,36 +118,13 @@ def handlePhoto(update: Update, context: CallbackContext):
     state = "location"
     update.message.reply_text("Where is this found?")
 
-
-
-user_ids = []
-def user_verified(user_id):
-    if user_id in user_ids:
-        print("user id found")
-        return True
-    else:
-        print("user id not found")
-        return False 
-
-def verify(update: Update, context: CallbackContext):
-    global user_ids
-    user_id = update.effective_user.id
-    user_ids.append(user_id)  
-    print("after verify (in command)", user_ids)
-    dp.add_handler(MessageHandler(Filters.text, handleText))     
-    dp.add_handler(MessageHandler(Filters.photo, handlePhoto))
-
-
-
 def main():
     # transferred these two lines above to test, may need to move back here
     # updater = Updater(TOKEN, use_context=True)
     # dp = updater.dispatcher
-    print("at the start, user_ids", user_ids)
 
     # It handle /start or other slash commands
     dp.add_handler(CommandHandler("start", start)) # slash command to test
-    dp.add_handler(CommandHandler("verify", verify)) # slash command to test
 
     # otp stuff from richard
     conv_handler = ConversationHandler(
@@ -141,17 +138,8 @@ def main():
     # dp.add_handler(CommandHandler("clear_otps", admin_clear_otps))
     dp.add_handler(conv_handler)
 
-    user_id = "test"
-    if user_verified(user_id): 
-        print("verified")
-        print("current user_ids", user_ids)
-        dp.add_handler(MessageHandler(Filters.text, handleText))     
-        dp.add_handler(MessageHandler(Filters.photo, handlePhoto))
-        # may have future problem if you want to upload multiple photographs
-    else:
-        print("not verified")
-        print("current user_ids", user_ids)
-
+    dp.add_handler(MessageHandler(Filters.text, handleText))     
+    dp.add_handler(MessageHandler(Filters.photo, handlePhoto))
    
     updater.start_polling()
 
