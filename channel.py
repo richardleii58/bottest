@@ -25,4 +25,4 @@ CHAT_IDS = convert_to_list(CHAT_IDS)
 def broadcast(buffetObj, chat_ids = CHAT_IDS, token = TOKEN):
     bot = telegram.Bot(TOKEN)
     for chat_id in chat_ids:
-        bot.sendPhoto(chat_id, buffetObj.photo, f"Location: {buffetObj.location}\nTime: {buffetObj.expiry}")
+        bot.sendPhoto(chat_id, buffetObj.photo, f"Location: {buffetObj.location}\nTime: {buffetObj.expiry}\nDietary Restrictions: {buffetObj['diet']}")

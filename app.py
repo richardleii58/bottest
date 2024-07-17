@@ -86,8 +86,16 @@ def handleText(update: Update, context: CallbackContext):
 
     elif state == "expiry": 
         # may need to add checks here to verify that it's correct
-        curBuffet["expiry"] = f"#{update.message.text}" # change this to buttons instead
+        curBuffet["expiry"] = update.message.text # change this to buttons instead
         update.message.reply_text("You have entered a time!")
+        # expiry date successful added, move on to next step
+        update.message.reply_text("What are some dietary restrictions?")
+        state = "diet"
+
+    elif state == "diet": 
+        # may need to add checks here to verify that it's correct
+        curBuffet["expiry"] = f"#{update.message.text}" # change this to buttons instead
+        update.message.reply_text("You have some restrictions!")
         # expiry date successful added, move on to next step
         state = "ready"
 
@@ -95,9 +103,9 @@ def handleText(update: Update, context: CallbackContext):
     if state == "ready": 
         # give confirmation message
         # allow them to add more info or edit their information 
-        update.message.reply_photo(curBuffet['file_id'], f"Location: {curBuffet['location']}\nTime: {curBuffet['expiry']}")
+        update.message.reply_photo(curBuffet['file_id'], f"Location: {curBuffet['location']}\nTime: {curBuffet['expiry']}\nDietary Restrictions: {curBuffet['diet']}")
         print(curBuffet)
-        buffetObj = Buffet(curBuffet['file_id'], curBuffet['location'], curBuffet['expiry'])
+        buffetObj = Buffet(curBuffet['file_id'], curBuffet['location'], curBuffet['expiry'], curBuffet['diet'])
 
         # SENDING IT OFF
         upload(buffetObj)
@@ -108,8 +116,8 @@ def handleText(update: Update, context: CallbackContext):
 def upload(buffetObj):
     # database stuff
     # photo, expiry, location, info
-    sql = f"insert into buffet(photo, expiry, location, info) values \
-            ('{buffetObj.photo}', '{buffetObj.expiry}', '{buffetObj.location}', NULL);"
+    sql = f"insert into buffet(photo, expiry, location, diet, info) values \
+            ('{buffetObj.photo}', '{buffetObj.expiry}', '{buffetObj.location}', '{buffetObj.diet}', NULL);"
     executeSQL(sql)
 
 
