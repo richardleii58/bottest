@@ -39,6 +39,7 @@ cursor.execute('''
         file_id TEXT not null,
         location TEXT not null,
         expiry TEXT not null,
+        diet TEXT not null,
         info TEXT
     );
 ''') # triple ' lets you enter multiline
