@@ -86,7 +86,7 @@ def handleText(update: Update, context: CallbackContext):
 
     elif state == "expiry": 
         # may need to add checks here to verify that it's correct
-        curBuffet["expiry"] = update.message.text # change this to buttons instead
+        curBuffet["expiry"] = f"#{update.message.text}" # change this to buttons instead
         update.message.reply_text("You have entered a time!")
         # expiry date successful added, move on to next step
         state = "ready"
