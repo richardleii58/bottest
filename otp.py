@@ -10,8 +10,12 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Conve
 from database import getVerifiedUserIDs, addVerifiedUser
 
 # Email configuration
-EMAIL_ADDRESS = os.environ['EMAIL_ADDRESS']
-EMAIL_PASSWORD = os.environ['EMAIL_PASSWORD']
+# EMAIL_ADDRESS = os.environ['EMAIL_ADDRESS']
+# EMAIL_PASSWORD = os.environ['EMAIL_PASSWORD']
+
+# load_dotenv("./.env")
+EMAIL_ADDRESS = os.getenv('EMAIL_ADDRESS')
+EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
 # Define conversation states
 EMAIL, OTP = range(2)

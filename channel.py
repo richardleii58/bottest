@@ -3,8 +3,10 @@ import telegram
 import os
 from dotenv import load_dotenv
 
+# TOKEN = os.environ['TOKEN']
 load_dotenv("./.env")
 TOKEN = os.getenv("token")
+
 # CHAT_ID = os.getenv("chat_id")
 # get list of chat ids from database later. now is a string in .env
 def convert_to_list(str):
@@ -16,6 +18,7 @@ def convert_to_list(str):
     return new_list
 
 CHAT_IDS = os.getenv("chat_ids")
+# CHAT_IDS = os.environ["chat_ids"] 
 CHAT_IDS = convert_to_list(CHAT_IDS)
 
 

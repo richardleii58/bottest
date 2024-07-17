@@ -17,17 +17,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-def convertToBinaryData(filename):
-    # Convert digital data to binary format
-    with open(filename, 'rb') as file:
-        binaryData = file.read()
-    return binaryData
-
-def write_file(data, filename):
-    # Convert binary data to proper format and write it on Hard Disk
-    with open(filename, 'wb') as file:
-        file.write(data)
-
+# TOKEN = os.environ['TOKEN']
 load_dotenv("./.env")
 TOKEN = os.getenv("token")
 
@@ -52,9 +42,6 @@ def handleText(update: Update, context: CallbackContext):
         # then check if it has been recently verified
         user_id = update.effective_user.id
         verified_users = getVerifiedUserIDs()
-        print(user_id)
-        print(verified_users)
-
         if user_id in verified_users:
             verified = True
         else:
@@ -67,14 +54,14 @@ def handleText(update: Update, context: CallbackContext):
 
     elif state == "location": 
         # now we want a location
-        if len(update.message.text.lower()) < 10: # may not keep this
-            update.message.reply_text("Please enter more information!")
-        else:
-            curBuffet["location"] = update.message.text
-            update.message.reply_text("You have entered a location!")
-            # location successful added, move on to next step
-            update.message.reply_text("When does this have to be cleared by?")
-            state = "expiry"
+        # if len(update.message.text.lower()) < 10: # may not keep this
+        #     update.message.reply_text("Please enter more information!")
+        # else:
+        curBuffet["location"] = update.message.text
+        update.message.reply_text("You have entered a location!")
+        # location successful added, move on to next step
+        update.message.reply_text("When does this have to be cleared by?")
+        state = "expiry"
 
     elif state == "expiry": 
         # may need to add checks here to verify that it's correct
@@ -89,7 +76,13 @@ def handleText(update: Update, context: CallbackContext):
         # allow them to add more info or edit their information 
         update.message.reply_photo(curBuffet['file_id'], f"Location: {curBuffet['location']}\nTime: {curBuffet['expiry']}")
         print(curBuffet)
+
+        file_info = context.bot.getFile(curBuffet['file_id'])
+        print(file_info)
+        download_file = file_info.download_as_bytearray()
+
         buffetObj = Buffet(curBuffet['file_id'], curBuffet['location'], curBuffet['expiry'])
+
 
         # SENDING IT OFF
         upload(buffetObj)
@@ -108,15 +101,24 @@ def upload(buffetObj):
 def handlePhoto(update: Update, context: CallbackContext):
     global verified
     if verified == False:
-        update.message.reply_text("Use /otp to get started")
-        return
+        # then check if it has been recently verified
+        user_id = update.effective_user.id
+        verified_users = getVerifiedUserIDs()
+        if user_id in verified_users:
+            verified = True
+        else:
+            update.message.reply_text("Use /otp to get started")
+            return # don't want to let them keep going
+
     update.message.reply_text("You have uploaded a photo!")
     # turn into blob: https://pynative.com/python-mysql-blob-insert-retrieve-file-image-as-a-blob-in-mysql/#h-what-is-blob
     file_id = update.message.photo[-1].file_id
     curBuffet['file_id'] = file_id
+
     global state
     state = "location"
     update.message.reply_text("Where is this found?")
+
 
 def main():
     # transferred these two lines above to test, may need to move back here
