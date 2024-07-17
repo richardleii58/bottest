@@ -1,4 +1,5 @@
 from telegram import Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters, ConversationHandler
 from dotenv import load_dotenv
 import logging
@@ -8,7 +9,6 @@ from buffet import Buffet
 from database import executeSQL, addVerifiedUser, getVerifiedUserIDs
 from channel import broadcast
 from otp import *
-
 
 logging.basicConfig(
     format = '%(asctime)s -- %(name)s -- %(levelname)s -- %(message)s',
@@ -36,6 +36,12 @@ TOKEN = os.environ['TOKEN']
 curBuffet = {} # initiate dictionary? to store the info user is inputting before uploading to database
 state = "blank" # i need a variable to track what stage the user is at, to be reset everytime
 verified = False
+
+# Define conversation states
+EXPIRY, DIETARY_REQUIREMENTS = range(2)
+
+# List of dietary requirements
+dietary_requirements = ["Vegetarian", "Vegan", "Gluten-Free", "Nut-Free", "Dairy-Free"]
 
 updater = Updater(TOKEN, use_context=True)
 dp = updater.dispatcher
@@ -91,25 +97,63 @@ def handleText(update: Update, context: CallbackContext):
         # expiry date successful added, move on to next step
         state = "ready"
 
+    #added dietary requirements state, prompted as an inline keyboard button
+    elif state == "diet":
+        return dietary_requirements_step(update, context)
+    
     # if used here cause whenever ready it will just send
     if state == "ready": 
         # give confirmation message
         # allow them to add more info or edit their information 
-        update.message.reply_photo(curBuffet['file_id'], f"Location: {curBuffet['location']}\nTime: {curBuffet['expiry']}")
+        update.message.reply_photo(curBuffet['file_id'], f"Location: {curBuffet['location']}\nTime: {curBuffet['expiry']} \nTime: {buffetObj.expiry}\nDietary Restrictions: {buffetObj.diet}")
         print(curBuffet)
-        buffetObj = Buffet(curBuffet['file_id'], curBuffet['location'], curBuffet['expiry'])
+        buffetObj = Buffet(curBuffet['file_id'], curBuffet['location'], curBuffet['expiry'], curBuffet['diet'])
 
         # SENDING IT OFF
         upload(buffetObj)
         broadcast(buffetObj)
         state = "blank"
 
+#displays the dietary requirements as inline buttons.
+
+def dietary_requirements_step(update, context):
+    user_id = update.effective_user.id
+    curBuffet[user_id] = {"dietary": []}
+    
+    keyboard = [
+        [InlineKeyboardButton(req, callback_data=req) for req in dietary_requirements]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    update.message.reply_text("Please select your dietary requirements:", reply_markup=reply_markup)
+    return DIETARY_REQUIREMENTS
+
+#handles the toggling of dietary requirement selections.
+def dietary_requirements_selection(update, context):
+    query = update.callback_query
+    query.answer()
+
+    user_id = query.message.chat_id
+    selected_req = query.data
+
+    if selected_req in curBuffet[user_id]["dietary"]:
+        curBuffet[user_id]["dietary"].remove(selected_req)
+    else:
+        curBuffet[user_id]["dietary"].append(selected_req)
+    
+    keyboard = [
+        [InlineKeyboardButton(f"{'✅ ' if req in curBuffet[user_id]["dietary"] else ''}{req}", callback_data=req) for req in dietary_requirements]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    query.edit_message_text("Please select your dietary requirements:", reply_markup=reply_markup)
+    return DIETARY_REQUIREMENTS
 
 def upload(buffetObj):
     # database stuff
     # photo, expiry, location, info
-    sql = f"insert into buffet(photo, expiry, location, info) values \
-            ('{buffetObj.photo}', '{buffetObj.expiry}', '{buffetObj.location}', NULL);"
+    sql = f"insert into buffet(photo, expiry, location, diet, info) values \
+            ('{buffetObj.photo}', '{buffetObj.expiry}', '{buffetObj.location}', {buffetObj.diet}, NULL);"
     executeSQL(sql)
 
 
