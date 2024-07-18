@@ -5,7 +5,7 @@ import logging
 import os
 
 from buffet import Buffet
-from database import executeSQL, addVerifiedUser, getVerifiedUserIDs
+from database import executeSQL, addVerifiedUser, getVerifiedUserIDs, deleteVerifiedUser
 from channel import broadcast
 from otp import *
 from telegram import *
@@ -161,6 +161,7 @@ def main():
     # It handle /start or other slash commands
     dp.add_handler(CommandHandler("start", start)) # slash command to test
     dp.add_handler(CommandHandler("help", help)) # slash command to help
+    dp.add_handler(CommandHandler("admin_clear_otps", admin_clear_otps)) #admin clear
 
     # otp stuff from richard
     conv_handler = ConversationHandler(

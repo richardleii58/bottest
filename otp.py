@@ -7,7 +7,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 
-from database import getVerifiedUserIDs, addVerifiedUser
+from database import getVerifiedUserIDs, addVerifiedUser, deleteVerifiedUser
 
 # Email configuration
 EMAIL_ADDRESS = os.environ['EMAIL_ADDRESS']
@@ -25,7 +25,7 @@ ADMIN_USERS = [123456789]  # Replace with actual admin user IDs
 def admin_clear_otps(update, context):
     user_id = update.effective_user.id
     if user_id in ADMIN_USERS:
-        user_otps.clear()
+        deleteVerifiedUser()
         # otp_confirmed.clear()
         update.message.reply_text('All OTPs have been cleared.')
     else:

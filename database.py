@@ -112,3 +112,8 @@ def addVerifiedUser(user_id):
     sqlStatement = f"insert into verified_users values ({user_id})"
     executeSQL(sqlStatement)
 
+def deleteVerifiedUser():
+    sqlStatement = "DELETE FROM verified_users"
+    executeSQL(sqlStatement)
+    print(f"Verified users has been deleted.")
+
