@@ -18,7 +18,6 @@ DATABASE_URL = os.environ['DATABASE_URL']
 # load_dotenv("./.env")
 # DATABASE_URL = os.getenv("DATABASE_URL")
 url = urlparse(DATABASE_URL) 
-
 conn = psycopg2.connect(
     database=url.path[1:],
     user=url.username,
