@@ -20,7 +20,7 @@ EMAIL, OTP = range(2)
 user_otps = {}
 
 # List of admin user IDs
-ADMIN_USERS = [123456789]  # Replace with actual admin user IDs
+ADMIN_USERS = [760005970, 6008301227]  # Replace with actual admin user IDs
 
 def admin_clear_otps(update, context):
     user_id = update.effective_user.id
