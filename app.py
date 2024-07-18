@@ -41,14 +41,34 @@ updater = Updater(TOKEN, use_context=True)
 dp = updater.dispatcher
 
 def start(update: Update, context: CallbackContext): 
-    update.message.reply_text("Hello and welcome to BufferClearers Bot! 👋\n\n"
+    update.message.reply_text(
+        "Hello and welcome to BuffetClearer Bot! 🎉🍴\n\n"
+        "We're thrilled to have you here. BuffetClearer Bot is your perfect assistant for managing and clearing buffet tables effortlessly. "
+        "Whether it's a small family gathering or a large event, we've got you covered. Let's make your event smooth and enjoyable!\n\n"
         "This bot is here to help you with various tasks and provide you with seamless interactions. "
         "To access certain features and ensure the security of your account, we require email verification. "
         "Please click the button below to start the verification process. "
         "Once verified, you'll be able to enjoy all the features our bot has to offer!\n\n"
-        "If you have any questions or need assistance, feel free to reach out.\n\n"
-        "Let's get started!")
+        "For any help or support, reach out to our amazing team at @lilleiii and others who are ready to assist you. "
+        "Enjoy your event while we handle the rest! ✨\n\n")
 
+def help(update: Update, context: CallbackContext): 
+    update.message.reply_text(
+        
+        "Commands\n"
+        "/start: First message, teaches users how to use the bot.\n"
+        "/help: Brings up a list of commands.\n"
+        "/reset, /stop: Resets or stops the bot's current operation.\n"
+        "/location: Edits the location. (Displays an error message if no location is set.)\n"
+        "/expiry, /time: Edits the time. (Displays an error message if no time is set.)\n"
+        "/add_info: Adds or edits additional information.\n"
+        "/confirm: Uploads the information to the database.\n"
+        "/otp: Authenticates the user.\n"
+        "/timings: Provides options to indicate the timing.\n"
+        "/cancel: Cancels the OTP verification process.\n"
+        "Simply type any command or use the inline buttons to get started!\n\n"
+        "For further assistance, contact @lilleiii and our support team."
+    )
 
 def handleText(update: Update, context: CallbackContext):
     # else if used so that it only registers one state at a time
@@ -141,6 +161,7 @@ def main():
 
     # It handle /start or other slash commands
     dp.add_handler(CommandHandler("start", start)) # slash command to test
+    dp.add_handler(CommandHandler("help", help)) # slash command to help
 
     # otp stuff from richard
     conv_handler = ConversationHandler(
