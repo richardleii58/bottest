@@ -8,7 +8,8 @@ from buffet import Buffet
 from database import executeSQL, addVerifiedUser, getVerifiedUserIDs
 from channel import broadcast
 from otp import *
-
+from telegram import *
+load_dotenv()
 
 logging.basicConfig(
     format = '%(asctime)s -- %(name)s -- %(levelname)s -- %(message)s',
@@ -41,16 +42,14 @@ updater = Updater(TOKEN, use_context=True)
 dp = updater.dispatcher
 
 def start(update: Update, context: CallbackContext): 
-    update.message.reply_text(
-        "Hello and welcome to BuffetClearer Bot! 🎉🍴\n\n"
-        "We're thrilled to have you here. BuffetClearer Bot is your perfect assistant for managing and clearing buffet tables effortlessly. "
-        "Whether it's a small family gathering or a large event, we've got you covered. Let's make your event smooth and enjoyable!\n\n"
+    button = ReplyKeyboardMarkup([[KeyboardButton('/otp'), KeyboardButton('Post something')],[KeyboardButton('/cancel')]])
+    update.message.reply_text("Hello and welcome to BufferClearers Bot! 👋\n\n"
         "This bot is here to help you with various tasks and provide you with seamless interactions. "
         "To access certain features and ensure the security of your account, we require email verification. "
         "Please click the button below to start the verification process. "
         "Once verified, you'll be able to enjoy all the features our bot has to offer!\n\n"
-        "For any help or support, reach out to our amazing team at @lilleiii and others who are ready to assist you. "
-        "Enjoy your event while we handle the rest! ✨\n\n")
+        "If you have any questions or need assistance, feel free to reach out.\n\n"
+        "Let's get started!", reply_markup=button)
 
 def help(update: Update, context: CallbackContext): 
     update.message.reply_text(
@@ -177,7 +176,7 @@ def main():
 
     dp.add_handler(MessageHandler(Filters.text, handleText))     
     dp.add_handler(MessageHandler(Filters.photo, handlePhoto))
-   
+
     updater.start_polling()
 
     Updater.idle()
