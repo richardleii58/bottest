@@ -73,7 +73,7 @@ def handleText(update: Update, context: CallbackContext):
     # else if used so that it only registers one state at a time
     global state
     global verified
-    state = "blank" 
+    
     print(state)
     if verified == False:
         # then check if it has been recently verified
