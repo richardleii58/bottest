@@ -112,11 +112,7 @@ def handleText(update: Update, context: CallbackContext):
         state = "diet"
 
     elif state == "diet": 
-        # may need to add checks here to verify that it's correct
-        curBuffet["diet"] = f"#{update.message.text}" # change this to buttons instead
-        update.message.reply_text("You have some restrictions!")
-        # expiry date successful added, move on to next step
-        state = "ready"
+        choose_diet(update, context)
 
     # if used here cause whenever ready it will just send
     if state == "ready": 
@@ -131,7 +127,33 @@ def handleText(update: Update, context: CallbackContext):
         broadcast(buffetObj)
         state = "blank"
 
+#diet button
+def choose_diet(update, context):
+    keyboard = [
+        [InlineKeyboardButton("Vegetarian", callback_data='Vegetarian')],
+        [InlineKeyboardButton("Vegan", callback_data='Vegan')],
+        [InlineKeyboardButton("Gluten-Free", callback_data='Gluten-Free')],
+        [InlineKeyboardButton("Keto", callback_data='Keto')],
+        [InlineKeyboardButton("Paleo", callback_data='Paleo')]
+    ]
 
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text('Please choose your diet restrictions:', reply_markup=reply_markup)
+
+def button(update, context):
+    query = update.callback_query
+    query.answer()
+    selected_diet = query.data
+
+    # Update the current buffet with the selected diet
+    curBuffet["diet"] = f"#{selected_diet}"
+    query.edit_message_text(text=f"You have added your restrictions: {selected_diet}")
+
+    # Move on to the next step
+    global state
+    state = "ready"
+
+#object processor
 def upload(buffetObj):
     # database stuff
     # photo, expiry, location, info
@@ -139,7 +161,7 @@ def upload(buffetObj):
             ('{buffetObj.photo}', '{buffetObj.expiry}', '{buffetObj.location}', '{buffetObj.diet}', NULL);"
     executeSQL(sql)
 
-
+#photo processor
 def handlePhoto(update: Update, context: CallbackContext):
     global verified
     if verified == False:
@@ -162,6 +184,7 @@ def main():
     dp.add_handler(CommandHandler("start", start)) # slash command to test
     dp.add_handler(CommandHandler("help", help)) # slash command to help
     dp.add_handler(CommandHandler("admin_clear_otps", admin_clear_otps)) #admin clear
+    dp.add_handler(CommandHandler("choose_diet", choose_diet)) #diet button
 
     # otp stuff from richard
     conv_handler = ConversationHandler(
