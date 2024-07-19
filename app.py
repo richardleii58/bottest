@@ -124,7 +124,7 @@ def handleText(update: Update, context: CallbackContext):
         state = "blank"
 
 #diet button
-def choose_diet(update: Update, context: CallbackContext):
+def choose_diet(update, context):
     keyboard = [
         [InlineKeyboardButton("Vegetarian", callback_data='Vegetarian')],
         [InlineKeyboardButton("Vegan", callback_data='Vegan')],
@@ -137,7 +137,7 @@ def choose_diet(update: Update, context: CallbackContext):
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_text('Please choose your diet restrictions:', reply_markup=reply_markup)
 
-def dietbutton(update: Update, context: CallbackContext):
+def dietbutton(update, context):
     query = update.callback_query
     query.answer()
     selected_diet = query.data
