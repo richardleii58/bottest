@@ -144,7 +144,7 @@ def dietbutton(update: Update, context: CallbackContext):
 
     # Update the current buffet with the selected diet
     curBuffet["diet"] = f"#{selected_diet}"
-    query.edit_message_text(text=f"You have added your restrictions: {selected_diet}, type to confirm!")
+    query.edit_message_text(text=f"You have added your restrictions: {selected_diet}. Type anything to confirm!")
 
     # Move on to the next step
     global state
