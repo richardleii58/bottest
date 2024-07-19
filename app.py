@@ -42,7 +42,7 @@ updater = Updater(TOKEN, use_context=True)
 dp = updater.dispatcher
 
 def start(update: Update, context: CallbackContext): 
-    button = ReplyKeyboardMarkup([[KeyboardButton('/otp'), KeyboardButton('Post something')],[KeyboardButton('/cancel')],[KeyboardButton('/help')]])
+    button = ReplyKeyboardMarkup([[KeyboardButton('/otp'), KeyboardButton('Post something')],[KeyboardButton('/cancel'), KeyboardButton('/help')]])
     update.message.reply_text("Hello and welcome to BufferClearers Bot! 👋\n\n"
         "This bot is here to help you with various tasks and provide you with seamless interactions. "
         "To access certain features and ensure the security of your account, we require email verification. "
@@ -108,10 +108,6 @@ def handleText(update: Update, context: CallbackContext):
         curBuffet["expiry"] = update.message.text # change this to buttons instead
         update.message.reply_text("You have entered a time!")
         # expiry date successful added, move on to next step
-        update.message.reply_text("What are some dietary restrictions?")
-        state = "diet"
-
-    elif state == "diet": 
         choose_diet(update, context)
 
     # if used here cause whenever ready it will just send
@@ -134,7 +130,8 @@ def choose_diet(update: Update, context: CallbackContext):
         [InlineKeyboardButton("Vegan", callback_data='Vegan')],
         [InlineKeyboardButton("Gluten-Free", callback_data='Gluten-Free')],
         [InlineKeyboardButton("Keto", callback_data='Keto')],
-        [InlineKeyboardButton("Paleo", callback_data='Paleo')]
+        [InlineKeyboardButton("Paleo", callback_data='Paleo')],
+        [InlineKeyboardButton("Halal", callback_data='Halal')]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -147,7 +144,7 @@ def dietbutton(update: Update, context: CallbackContext):
 
     # Update the current buffet with the selected diet
     curBuffet["diet"] = f"#{selected_diet}"
-    query.edit_message_text(text=f"You have added your restrictions: {selected_diet}")
+    query.edit_message_text(text=f"You have added your restrictions: {selected_diet}, type to confirm!")
 
     # Move on to the next step
     global state
