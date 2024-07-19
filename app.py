@@ -42,7 +42,7 @@ updater = Updater(TOKEN, use_context=True)
 dp = updater.dispatcher
 
 def start(update: Update, context: CallbackContext): 
-    button = ReplyKeyboardMarkup([[KeyboardButton('Verify Myself'), KeyboardButton('Post Something')],[KeyboardButton('/cancel')]])
+    button = ReplyKeyboardMarkup([[KeyboardButton('Verify Myself'), KeyboardButton('Post Something')],[KeyboardButton('Cancel Verification')]])
     update.message.reply_text("Hello and welcome to BufferClearers Bot! 👋\n\n"
         "This bot is here to help you with various tasks and provide you with seamless interactions. "
         "To access certain features and ensure the security of your account, we require email verification. "
