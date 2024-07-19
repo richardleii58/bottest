@@ -121,6 +121,7 @@ def handleText(update: Update, context: CallbackContext):
         # SENDING IT OFF
         upload(buffetObj)
         broadcast(buffetObj)
+        global state 
         state = "blank"
 
 #diet button
