@@ -42,7 +42,7 @@ updater = Updater(TOKEN, use_context=True)
 dp = updater.dispatcher
 
 def start(update: Update, context: CallbackContext): 
-    button = ReplyKeyboardMarkup([[KeyboardButton('/otp'), KeyboardButton('Post something')],[KeyboardButton('/cancel')]])
+    button = ReplyKeyboardMarkup([[KeyboardButton('Verify Myself'), KeyboardButton('Post Something')],[KeyboardButton('/cancel')]])
     update.message.reply_text("Hello and welcome to BufferClearers Bot! 👋\n\n"
         "This bot is here to help you with various tasks and provide you with seamless interactions. "
         "To access certain features and ensure the security of your account, we require email verification. "
@@ -140,7 +140,7 @@ def choose_diet(update: Update, context: CallbackContext):
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_text('Please choose your diet restrictions:', reply_markup=reply_markup)
 
-def button(update: Update, context: CallbackContext):
+def dietbutton(update: Update, context: CallbackContext):
     query = update.callback_query
     query.answer()
     selected_diet = query.data
