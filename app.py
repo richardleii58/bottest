@@ -42,7 +42,7 @@ updater = Updater(TOKEN, use_context=True)
 dp = updater.dispatcher
 
 def start(update: Update, context: CallbackContext): 
-    button = ReplyKeyboardMarkup([[KeyboardButton('/otp'), KeyboardButton('Post something')],[KeyboardButton('/cancel')]])
+    button = ReplyKeyboardMarkup([[KeyboardButton('/otp'), KeyboardButton('Post something')],[KeyboardButton('/cancel')],[KeyboardButton('/help')]])
     update.message.reply_text("Hello and welcome to BufferClearers Bot! 👋\n\n"
         "This bot is here to help you with various tasks and provide you with seamless interactions. "
         "To access certain features and ensure the security of your account, we require email verification. "
@@ -140,7 +140,7 @@ def choose_diet(update: Update, context: CallbackContext):
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_text('Please choose your diet restrictions:', reply_markup=reply_markup)
 
-def button(update: Update, context: CallbackContext):
+def dietbutton(update: Update, context: CallbackContext):
     query = update.callback_query
     query.answer()
     selected_diet = query.data
@@ -185,7 +185,7 @@ def main():
     dp.add_handler(CommandHandler("help", help)) # slash command to help
     dp.add_handler(CommandHandler("admin_clear_otps", admin_clear_otps)) #admin clear
     dp.add_handler(CommandHandler("choose_diet", choose_diet)) #diet button
-
+    dp.add_handler(CallbackQueryHandler(dietbutton))
     # otp stuff from richard
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('otp', request_otp)],
