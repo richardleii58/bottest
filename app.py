@@ -157,7 +157,7 @@ def dietbutton(update, context):
 def upload(buffetObj):
     # database stuff
     # photo, expiry, location, info
-    sql = f"insert into buffet(photo, expiry, location, diet) values \
+    sql = f"insert into buffet(file_id, expiry, location, diet) values \
             ('{buffetObj.photo}', '{buffetObj.expiry}', '{buffetObj.location}', '{buffetObj.diet}');"
     executeSQL(sql)
 
