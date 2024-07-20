@@ -118,7 +118,7 @@ def handleText(update: Update, context: CallbackContext):
         # allow them to add more info or edit their information 
         update.message.reply_photo(curBuffet['file_id'], f"Location: {curBuffet['location']}\nTime: {curBuffet['expiry']}\nDietary Restrictions: {curBuffet['diet']}")
         print(curBuffet)
-        buffetObj = Buffet(curBuffet['file_id'], curBuffet['location'], curBuffet['expiry'], curBuffet['diet'])
+        buffetObj = Buffet(curBuffet['file_id'], curBuffet['location'], curBuffet['expiry'], curBuffet['diet'], curBuffet['hold'])
 
         # SENDING IT OFF
         upload(buffetObj)
