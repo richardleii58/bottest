@@ -34,6 +34,8 @@ TOKEN = os.environ['TOKEN']
 # load_dotenv("./.env")
 # TOKEN = os.getenv("token")
 
+global state
+
 curBuffet = {} # initiate dictionary? to store the info user is inputting before uploading to database
 state = "blank" # i need a variable to track what stage the user is at, to be reset everytime
 verified = False

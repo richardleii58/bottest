@@ -8,6 +8,7 @@ from email.mime.multipart import MIMEMultipart
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 
 from database import getVerifiedUserIDs, addVerifiedUser, deleteVerifiedUser
+from app import *
 
 # Email configuration
 EMAIL_ADDRESS = os.environ['EMAIL_ADDRESS']
@@ -27,6 +28,8 @@ def admin_clear_otps(update, context):
     if user_id in ADMIN_USERS:
         deleteVerifiedUser()
         # otp_confirmed.clear()
+        global verified
+        verified = False
         update.message.reply_text('All OTPs have been cleared.')
     else:
         update.message.reply_text('You do not have permission to use this command.')
@@ -87,6 +90,7 @@ def cancel(update, context):
 
 # Handler for the /otp command
 def request_otp(update, context):
+    
     user_id = update.effective_user.id
     if user_id in getVerifiedUserIDs():
         update.message.reply_text('Your OTP has already been confirmed. No need to request a new one.')
