@@ -124,6 +124,7 @@ def handleText(update: Update, context: CallbackContext):
         upload(buffetObj)
         broadcast(buffetObj)
         state = "blank"
+        return state
 
 #diet button
 def choose_diet(update, context):
