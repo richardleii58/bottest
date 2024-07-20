@@ -29,7 +29,7 @@ print(conn)
 conn.set_session(readonly=False)  # Ensure the connection is not read-only
 cursor = conn.cursor()
 
-cursor.execute("DROP TABLE IF EXISTS verified_users;") # used to delete table (if there are changes lol)
+# cursor.execute("DROP TABLE IF EXISTS verified_users;") # used to delete table (if there are changes lol)
 
 # Create tables if they don't exist
 cursor.execute('''
