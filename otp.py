@@ -31,6 +31,7 @@ def admin_clear_otps(update, context):
         global verified
         verified = False
         update.message.reply_text('All OTPs have been cleared.')
+        return verified
     else:
         update.message.reply_text('You do not have permission to use this command.')
 
