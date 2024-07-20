@@ -118,7 +118,7 @@ def handleText(update: Update, context: CallbackContext):
         # allow them to add more info or edit their information 
         update.message.reply_photo(curBuffet['file_id'], f"Location: {curBuffet['location']}\nTime: {curBuffet['expiry']}\nDietary Restrictions: {curBuffet['diet']}")
         print(curBuffet)
-        buffetObj = Buffet(curBuffet['file_id'], curBuffet['location'], curBuffet['expiry'], curBuffet['diet'], curBuffet['info'])
+        buffetObj = Buffet(curBuffet['file_id'], curBuffet['location'], curBuffet['expiry'], curBuffet['diet'])
 
         # SENDING IT OFF
         upload(buffetObj)
@@ -157,8 +157,8 @@ def dietbutton(update, context):
 def upload(buffetObj):
     # database stuff
     # photo, expiry, location, info
-    sql = f"insert into buffet(photo, expiry, location, diet, info) values \
-            ('{buffetObj.photo}', '{buffetObj.expiry}', '{buffetObj.location}', '{buffetObj.diet}', NULL);"
+    sql = f"insert into buffet(photo, expiry, location, diet) values \
+            ('{buffetObj.photo}', '{buffetObj.expiry}', '{buffetObj.location}', '{buffetObj.diet}');"
     executeSQL(sql)
 
 #photo processor
